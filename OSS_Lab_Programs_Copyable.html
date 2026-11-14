@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Operating Systems & Security — Executable Program Book</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1020;--panel:#121a2d;--panel2:#182238;--line:#2b3854;--text:#e8eefb;--muted:#a6b3ca;--accent:#7dd3fc;--green:#86efac}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}body{margin:0;background:radial-gradient(ellipse at top left,#162341 0,transparent 42%),var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{padding:34px clamp(18px,4vw,54px) 26px;border-bottom:1px solid var(--line)}.eyebrow{color:var(--accent);font-weight:800;letter-spacing:.12em;text-transform:uppercase;font-size:.75rem}
+h1{font-size:clamp(1.8rem,4vw,3rem);line-height:1.12;margin:.45rem 0}.intro{color:var(--muted);max-width:850px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.toolbar input{flex:1;min-width:230px}.toolbar input,button{font:inherit;border:1px solid var(--line);border-radius:10px;background:var(--panel2);color:var(--text);padding:11px 14px}.toolbar input:focus{outline:2px solid var(--accent)}button{cursor:pointer}button:hover{border-color:var(--accent)}.layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:24px;padding:24px clamp(14px,3vw,40px);max-width:1600px;margin:auto}
+nav{position:sticky;top:18px;align-self:start;max-height:calc(100vh - 36px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}nav h2{font-size:.95rem;margin:5px 8px 12px}nav a{display:flex;gap:10px;text-decoration:none;color:var(--muted);padding:9px 8px;border-radius:8px;font-size:.85rem}nav a span{color:var(--accent);font-weight:800;min-width:32px}nav a:hover{background:var(--panel2);color:var(--text)}
+main{min-width:0}.notice{border:1px solid #3b5270;background:#101b30;border-radius:12px;padding:14px 16px;color:var(--muted);margin-bottom:18px}.notice strong{color:var(--text)}
+.program{background:var(--panel);border:1px solid var(--line);border-radius:15px;margin-bottom:22px;overflow:hidden;scroll-margin-top:18px}.program-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:18px 20px}.program-head h2{margin:4px 0 0;font-size:1.12rem;line-height:1.4}.tag{color:var(--accent);font-size:.72rem;font-weight:800;letter-spacing:.1em}.copy{white-space:nowrap;background:#163047;border-color:#2d607b}.copy.done{color:var(--green);border-color:var(--green)}.code-meta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:8px 18px;background:#0d1526;border-block:1px solid var(--line);color:var(--muted);font-size:.75rem}.code-meta span:first-child{color:var(--accent);font-weight:800}pre{margin:0;padding:20px;overflow:auto;background:#080d18;color:#d9e6f7;font:13px/1.65 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;tab-size:4}code{font:inherit;white-space:pre}.status{min-height:0;padding:0 18px;color:var(--green);font-size:.8rem}.status:not(:empty){padding-bottom:12px}.empty{display:none;color:var(--muted);padding:24px}.footer{padding:24px;color:var(--muted);text-align:center;border-top:1px solid var(--line)}
+@media(max-width:900px){.layout{grid-template-columns:1fr}nav{position:relative;top:auto;max-height:300px}.program-head{align-items:flex-start}pre{font-size:12px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">Lab manual · Quick reference</div>
+  <h1>Operating Systems &amp; Security</h1>
+  <p class="intro">Program titles and corrected, runnable examples based on the uploaded OSS Lab Manual. Use the search box to find an experiment, then copy its code with the button or keyboard shortcut.</p>
+  <div class="toolbar">
+    <input id="search" type="search" placeholder="Search programs (e.g. FIFO, semaphore, ASLR)…" aria-label="Search programs">
+    <button id="copyFocused" type="button" title="Ctrl+Shift+C">Copy focused code · Ctrl+Shift+C</button>
+    <button id="expandAll" type="button">Show all programs</button>
+  </div>
+</header>
+<div class="layout">
+  <nav aria-label="Program navigation"><h2>All programs</h2>
+    <a href="#program-1" data-search="1 unix system calls — fork, exec, getpid, wait, exit, close, stat, opendir, readdir"><span>1</span>UNIX System Calls — fork, exec, getpid, wait, exit, close, stat, opendir, readdir</a>
+<a href="#program-2" data-search="2a cpu scheduling — priority (non-preemptive; lower number = higher priority)"><span>2A</span>CPU Scheduling — Priority (non-preemptive; lower number = higher priority)</a>
+<a href="#program-3" data-search="2b cpu scheduling — fcfs"><span>2B</span>CPU Scheduling — FCFS</a>
+<a href="#program-4" data-search="2c cpu scheduling — sjf (non-preemptive)"><span>2C</span>CPU Scheduling — SJF (non-preemptive)</a>
+<a href="#program-5" data-search="2d cpu scheduling — round robin"><span>2D</span>CPU Scheduling — Round Robin</a>
+<a href="#program-6" data-search="3 semaphore — producer/consumer (posix threads)"><span>3</span>Semaphore — Producer/Consumer (POSIX threads)</a>
+<a href="#program-7" data-search="4 shared memory — system v ipc (writer/reader demo)"><span>4</span>Shared Memory — System V IPC (writer/reader demo)</a>
+<a href="#program-8" data-search="5a banker&#x27;s algorithm — deadlock avoidance / safe sequence"><span>5A</span>Banker&#x27;s Algorithm — Deadlock Avoidance / Safe Sequence</a>
+<a href="#program-9" data-search="5b deadlock prevention — demonstrating the four conditions"><span>5B</span>Deadlock Prevention — Demonstrating the four conditions</a>
+<a href="#program-10" data-search="6a memory allocation — first fit"><span>6A</span>Memory Allocation — First Fit</a>
+<a href="#program-11" data-search="6b memory allocation — worst fit"><span>6B</span>Memory Allocation — Worst Fit</a>
+<a href="#program-12" data-search="6c memory allocation — best fit"><span>6C</span>Memory Allocation — Best Fit</a>
+<a href="#program-13" data-search="7a page replacement — fifo"><span>7A</span>Page Replacement — FIFO</a>
+<a href="#program-14" data-search="7b page replacement — lru"><span>7B</span>Page Replacement — LRU</a>
+<a href="#program-15" data-search="7c page replacement — lfu (ties: least recently used)"><span>7C</span>Page Replacement — LFU (ties: least recently used)</a>
+<a href="#program-16" data-search="8a security model — bell–lapadula (confidentiality)"><span>8A</span>Security Model — Bell–LaPadula (confidentiality)</a>
+<a href="#program-17" data-search="8b security model — biba (integrity)"><span>8B</span>Security Model — Biba (integrity)</a>
+<a href="#program-18" data-search="9 linux access control lists — setfacl / getfacl"><span>9</span>Linux Access Control Lists — setfacl / getfacl</a>
+<a href="#program-19" data-search="10 linux security — enable / disable aslr"><span>10</span>Linux Security — Enable / Disable ASLR</a>
+  </nav>
+  <main>
+    <div class="notice"><strong>Compile and run C programs:</strong> save the selected code as <code>program.c</code>, then run <code>gcc -std=c11 -Wall -Wextra program.c -o program</code> and <code>./program</code>. The semaphore example needs <code>gcc -std=c11 -Wall -Wextra program.c -o program -pthread</code>. Shell examples are commands, not C programs. Run only commands you understand; the ASLR-disable command temporarily weakens security.</div>
+    
+<section class="program" id="program-1" data-search="1 unix system calls — fork, exec, getpid, wait, exit, close, stat, opendir, readdir">
+  <div class="program-head">
+    <div><span class="tag">EX. 1</span><h2>UNIX System Calls — fork, exec, getpid, wait, exit, close, stat, opendir, readdir</h2></div>
+    <button class="copy" type="button" data-copy="program-1" title="Copy code (Ctrl+Shift+C)">Copy code</button>
+  </div>
+  <div class="code-meta"><span>C</span><span>Compile: gcc program.c -o program && ./program</span></div>
+  <pre tabindex="0" aria-label="Code for UNIX System Calls — fork, exec, getpid, wait, exit, close, stat, opendir, readdir"><code id="program-1-code" class="language-c">#define _POSIX_C_SOURCE 200809L
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;sys/wait.h&gt;
+#include &lt;sys/stat.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;dirent.h&gt;
+#include &lt;string.h&gt;
+#include &lt;errno.h&gt;
+
+int main(int argc, char **argv) {
+    const char *path = argc &gt; 1 ? argv[1] : &quot;.&quot;;
+    pid_t pid = fork();
+    if (pid &lt; 0) { perror(&quot;fork&quot;); return 1; }
+    if (pid == 0) {
+        printf(&quot;Child PID: %ld\n&quot;, (long)getpid());
+        struct stat st;
+        if (stat(path, &amp;st) == 0)
+            printf(&quot;stat: %s is %s\n&quot;, path, S_ISDIR(st.st_mode) ? &quot;directory&quot; : &quot;not a directory&quot;);
+        else perror(&quot;stat&quot;);
+        DIR *d = opendir(path);
+        if (!d) { perror(&quot;opendir&quot;); _exit(1); }
+        struct dirent *entry;
+        puts(&quot;Directory entries:&quot;);
+        while ((entry = readdir(d)) != NULL) puts(entry-&gt;d_name);
+        closedir(d);
+        int fd = open(&quot;/dev/null&quot;, O_RDONLY);
+        if (fd &gt;= 0) close(fd);
+        execlp(&quot;echo&quot;, &quot;echo&quot;, &quot;exec() successfully ran echo&quot;, (char *)NULL);
+        perror(&quot;execlp&quot;); _exit(1);
+    }
+    printf(&quot;Parent PID: %ld; child PID: %ld\n&quot;, (long)getpid(), (long)pid);
+    int status;
+    if (waitpid(pid, &amp;status, 0) &lt; 0) { perror(&quot;waitpid&quot;); return 1; }
+    printf(&quot;Child exit status: %d\n&quot;, WIFEXITED(status) ? WEXITSTATUS(status) : -1);
+    return 0;
+}</code></pre>
+  <div class="status" aria-live="polite"></div>
+</section>
+
+<section class="program" id="program-2" data-search="2a cpu scheduling — priority (non-preemptive; lower number = higher priority)">
+  <div class="program-head">
+    <div><span class="tag">EX. 2A</span><h2>CPU Scheduling — Priority (non-preemptive; lower number = higher priority)</h2></div>
+    <button class="copy" type="button" data-copy="program-2" title="Copy code (Ctrl+Shift+C)">Copy code</button>
+  </div>
+  <div class="code-meta"><span>C</span><span>Compile: gcc program.c -o program && ./program</span></div>
+  <pre tabindex="0" aria-label="Code for CPU Scheduling — Priority (non-preemptive; lower number = higher priority)"><code id="program-2-code" class="language-c">#include &lt;stdio.h&gt;
+typedef struct { int id, burst, priority, waiting, turnaround; } Process;
+int main(void) {
+    Process p[100], t; int n;
+    printf(&quot;Number of processes (1-100): &quot;);
+    if (scanf(&quot;%d&quot;, &amp;n) != 1 || n &lt; 1 || n &gt; 100) return puts(&quot;Invalid count.&quot;), 1;
+    for (int i=0;i&lt;n;i++) { p[i].id=i+1; printf(&quot;P%d burst time and priority: &quot;,i+1);
+        if (scanf(&quot;%d%d&quot;,&amp;p[i].burst,&amp;p[i].priority)!=2 || p[i].burst&lt;0) return puts(&quot;Invalid input.&quot;),1; }
+    for(int i=0;i&lt;n-1;i++) for(int j=i+1;j&lt;n;j++)
+        if(p[j].priority&lt;p[i].priority) { t=p[i];p[i]=p[j];p[j]=t; }
+    int time=0, sw=0, st=0;
+    puts(&quot;\nProcess  Priority  Burst  Waiting  Turnaround&quot;);
+    for(int i=0;i&lt;n;i++){p[i].waiting=time;p[i].turnaround=time+p[i].burst;time+=p[i].burst;
+        sw+=p[i].waiting;st+=p[i].turnaround;
+        printf(&quot;P%d\t%d\t%d\t%d\t%d\n&quot;,p[i].id,p[i].priority,p[i].burst,p[i].waiting,p[i].turnaround);}
+    printf(&quot;Average waiting: %.2f\nAverage turnaround: %.2f\n&quot;,(double)sw/n,(double)st/n);
+    return 0;
+}</code></pre>
+  <div class="status" aria-live="polite"></div>
+</section>
+
+<section class="program" id="program-3" data-search="2b cpu scheduling — fcfs">
+  <div class="program-head">
+    <div><span class="tag">EX. 2B</span><h2>CPU Scheduling — FCFS</h2></div>
+    <button class="copy" type="button" data-copy="program-3" title="Copy code (Ctrl+Shift+C)">Copy code</button>
+  </div>
+  <div class="code-meta"><span>C</span><span>Compile: gcc program.c -o program && ./program</span></div>
+  <pre tabindex="0" aria-label="Code for CPU Scheduling — FCFS"><code id="program-3-code" class="language-c">#include &lt;stdio.h&gt;
+int main(void) {
+    int n, b[100], wait[100], tat[100], totalW=0, totalT=0;
+    printf(&quot;Number of processes (1-100): &quot;);
+    if(scanf(&quot;%d&quot;,&amp;n)!=1 || n&lt;1 || n&gt;100) return puts(&quot;Invalid count.&quot;),1;
+    for(int i=0;i&lt;n;i++){printf(&quot;P%d burst time: &quot;,i+1);if(scanf(&quot;%d&quot;,&amp;b[i])!=1||b[i]&lt;0)return puts(&quot;Invalid burst time.&quot;),1;}
+    wait[0]=0;
+    for(int i=1;i&lt;n;i++) wait[i]=wait[i-1]+b[i-1];
+    puts(&quot;\nProcess  Burst  Waiting  Turnaround&quot;);
+    for(int i=0;i&lt;n;i++){tat[i]=wait[i]+b[i];totalW+=wait[i];totalT+=tat[i];
+        printf(&quot;P%d\t%d\t%d\t%d\n&quot;,i+1,b[i],wait[i],tat[i]);}
+    printf(&quot;Average waiting: %.2f\nAverage turnaround: %.2f\n&quot;,(double)totalW/n,(double)totalT/n);
+    return 0;
+}</code></pre>
+  <div class="status" aria-live="polite"></div>
+</section>
+
+<section class="program" id="program-4" data-search="2c cpu scheduling — sjf (non-preemptive)">
+  <div class="program-head">
+    <div><span class="tag">EX. 2C</span><h2>CPU Scheduling — SJF (non-preemptive)</h2></div>
+    <button class="copy" type="button" data-copy="program-4" title="Copy code (Ctrl+Shift+C)">Copy code</button>
+  </div>
+  <div class="code-meta"><span>C</span><span>Compile: gcc program.c -o program && ./program</span></div>
+  <pre tabindex="0" aria-label="Code for CPU Scheduling — SJF (non-preemptive)"><code id="program-4-code" class="language-c">#include &lt;stdio.h&gt;
+typedef struct {int id, burst, waiting, turnaround;} P;
+int main(void){
+    P p[100],t;int n,tw=0,tt=0,time=0;
+    printf(&quot;Number of processes (1-100): &quot;);
+    if(scanf(&quot;%d&quot;,&amp;n)!=1||n&lt;1||n&gt;100)return puts(&quot;Invalid count.&quot;),1;
+    for(int i=0;i&lt;n;i++){p[i].id=i+1;printf(&quot;P%d burst time: &quot;,i+1);
+        if(scanf(&quot;%d&quot;,&amp;p[i].burst)!=1||p[i].burst&lt;0)return puts(&quot;Invalid burst time.&quot;),1;}
+    for(int i=0;i&lt;n-1;i++)for(int j=i+1;j&lt;n;j++)
+        if(p[j].burst&lt;p[i].burst){t=p[i];p[i]=p[j];p[j]=t;}
+    puts(&quot;\nProcess  Burst  Waiting  Turnaround&quot;);
+    for(int i=0;i&lt;n;i++){p[i].waiting=time;p[i].turnaround=time+p[i].burst;time+=p[i].burst;
+        tw+=p[i].waiting;tt+=p[i].turnaround;
+        printf(&quot;P%d\t%d\t%d\t%d\n&quot;,p[i].id,p[i].burst,p[i].waiting,p[i].turnaround);}
+    printf(&quot;Average waiting: %.2f\nAverage turnaround: %.2f\n&quot;,(double)tw/n,(double)tt/n);return 0;
+}</code></pre>
+  <div class="status" aria-live="polite"></div>
+</section>
+
+<section class="program" id="program-5" data-search="2d cpu scheduling — round robin">
+  <div class="program-head">
+    <div><span class="tag">EX. 2D</span><h2>CPU Scheduling — Round Robin</h2></div>
+    <button class="copy" type="button" data-copy="program-5" title="Copy code (Ctrl+Shift+C)">Copy code</button>
+  </div>
+  <div class="code-meta"><span>C</span><span>Compile: gcc program.c -o program && ./program</span></div>
+  <pre tabindex="0" aria-label="Code for CPU Scheduling — Round Robin"><code id="program-5-code" class="language-c">#include &lt;stdio.h&gt;
+int main(void){
+    int n,bt[100],rem[100],wt[100]={0},tat[100],q,done,time=0,tw=0,tt=0;
+    printf(&quot;Number of processes (1-100): &quot;);
+    if(scanf(&quot;%d&quot;,&amp;n)!=1||n&lt;1||n&gt;100)return puts(&quot;Invalid count.&quot;),1;
+    for(int i=0;i&lt;n;i++){printf(&quot;P%d burst time: &quot;,i+1);if(scanf(&quot;%d&quot;,&amp;bt[i])!=1||bt[i]&lt;0)return puts(&quot;Invalid burst time.&quot;),1;rem[i]=bt[i];}
+    printf(&quot;Time quantum: &quot;);if(scanf(&quot;%d&quot;,&amp;q)!=1||q&lt;=0)return puts(&quot;Quantum must be positive.&quot;),1;
+    do{done=1;for(int i=0;i&lt;n;i++)if(rem[i]&gt;0){done=0;int run=rem[i]&lt;q?rem[i]:q;time+=run;rem[i]-=run;if(rem[i]==0)tat[i]=time;}}while(!done);
+    puts(&quot;\nProcess  Burst  Waiting  Turnaround&quot;);
+    for(int i=0;i&lt;n;i++){wt[i]=tat[i]-bt[i];tw+=wt[i];tt+=tat[i];printf(&quot;P%d\t%d\t%d\t%d\n&quot;,i+1,bt[i],wt[i],tat[i]);}
+    printf(&quot;Average waiting: %.2f\nAverage turnaround: %.2f\n&quot;,(double)tw/n,(double)tt/n);return 0;
+}</code></pre>
+  <div class="status" aria-live="polite"></div>
+</section>
+
+<section class="program" id="program-6" data-search="3 semaphore — producer/consumer (posix threads)">
+  <div class="program-head">
+    <div><span class="tag">EX. 3</span><h2>Semaphore — Producer/Consumer (POSIX threads)</h2></div>
+    <button class="copy" type="button" data-copy="program-6" title="Copy code (Ctrl+Shift+C)">Copy code</button>
+  </div>
+  <div class="code-meta"><span>C</span><span>Compile: gcc program.c -o program && ./program</span></div>
+  <pre tabindex="0" aria-label="Code for Semaphore — Producer/Consumer (POSIX threads)"><code id="program-6-code" class="language-c">#include &lt;stdio.h&gt;
+#include &lt;pthread.h&gt;
+#include &lt;semaphore.h&gt;
+#define SIZE 5
+#define ITEMS 10
+int buffer[SIZE], in=0, out=0;
+sem_t empty_slots, full_slots;
+pthread_mutex_t mutex=PTHREAD_MUTEX_INITIALIZER;
+void *producer(void *arg){
+    for(int i=1;i&lt;=ITEMS;i++){sem_wait(&amp;empty_slots);pthread_mutex_lock(&amp;mutex);
+        buffer[in]=i;in=(in+1)%SIZE;printf(&quot;Produced %d\n&quot;,i);
+        pthread_mutex_unlock(&amp;mutex);sem_post(&amp;full_slots);}
+    return NULL;
+}
+void *consumer(void *arg){
+    for(int i=1;i&lt;=ITEMS;i++){sem_wait(&amp;full_slots);pthread_mutex_lock(&amp;mutex);
+        int item=buffer[out];out=(out+1)%SIZE;printf(&quot;Consumed %d\n&quot;,item);
+        pthread_mutex_unlock(&amp;mutex);sem_post(&amp;empty_slots);}
+    return NULL;
+}
+int main(void){
+    pthread_t p,c;sem_init(&amp;empty_slots,0,SIZE);sem_init(&amp;full_slots,0,0);
+    if(pthread_create(&amp;p,NULL,producer,NULL)||pthread_create(&amp;c,NULL,consumer,NULL))return perror(&quot;pthread_create&quot;),1;
+    pthread_join(p,NULL);pthread_join(c,NULL);sem_destroy(&amp;empty_slots);sem_destroy(&amp;full_slots);pthread_mutex_destroy(&amp;mutex);return 0;
+}</code></pre>
+  <div class="status" aria-live="polite"></div>
+</section>
+
+<section class="program" id="program-7" data-search="4 shared memory — system v ipc (writer/reader demo)">
+  <div class="program-head">
+    <div><span class="tag">EX. 4</span><h2>Shared Memory — System V IPC (writer/reader demo)</h2></div>
+    <button class="copy" type="button" data-copy="program-7" title="Copy code (Ctrl+Shift+C)">Copy code</button>
+  </div>
+  <div class="code-meta"><span>C</span><span>Compile: gcc program.c -o program && ./program</span></div>
+  <pre tabindex="0" aria-label="Code for Shared Memory — System V IPC (writer/reader demo)"><code id="program-7-code" class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;sys/shm.h&gt;
+#include &lt;sys/wait.h&gt;
+#include &lt;unistd.h&gt;
+#define SHM_SIZE 1024
+int main(void){
+    int id=shmget(IPC_PRIVATE,SHM_SIZE,IPC_CREAT|0600);
+    if(id&lt;0)return perror(&quot;shmget&quot;),1;
+    char *mem=shmat(id,NULL,0);if(mem==(void*)-1){perror(&quot;shmat&quot;);shmctl(id,IPC_RMID,NULL);return 1;}
+    pid_t pid=fork();
+    if(pid&lt;0){perror(&quot;fork&quot;);shmdt(mem);shmctl(id,IPC_RMID,NULL);return 1;}
+    if(pid==0){snprintf(mem,SHM_SIZE,&quot;Hello from child process %ld&quot;,(long)getpid());shmdt(mem);_exit(0);}
+    waitpid(pid,NULL,0);printf(&quot;Shared memory says: %s\n&quot;,mem);
+    shmdt(mem);shmctl(id,IPC_RMID,NULL);return 0;
+}</code></pre>
+  <div class="status" aria-live="polite"></div>
+</section>
+
+<section class="program" id="program-8" data-search="5a banker&#x27;s algorithm — deadlock avoidance / safe sequence">
+  <div class="program-head">
+    <div><span class="tag">EX. 5A</span><h2>Banker&#x27;s Algorithm — Deadlock Avoidance / Safe Sequence</h2></div>
+    <button class="copy" type="button" data-copy="program-8" title="Copy code (Ctrl+Shift+C)">Copy code</button>
+  </div>
+  <div class="code-meta"><span>C</span><span>Compile: gcc program.c -o program && ./program</span></div>
+  <pre tabindex="0" aria-label="Code for Banker&#x27;s Algorithm — Deadlock Avoidance / Safe Sequence"><code id="program-8-code" class="language-c">#include &lt;stdio.h&gt;
+#define P 10
+#define R 10
+int main(void){
+    int n,m,alloc[P][R],max[P][R],need[P][R],avail[R],finish[P]={0},seq[P],count=0;
+    printf(&quot;Processes and resource types (max 10 each): &quot;);
+    if(scanf(&quot;%d%d&quot;,&amp;n,&amp;m)!=2||n&lt;1||n&gt;P||m&lt;1||m&gt;R)return puts(&quot;Invalid dimensions.&quot;),1;
+    puts(&quot;Enter allocation matrix:&quot;);
+    for(int i=0;i&lt;n;i++)for(int j=0;j&lt;m;j++)if(scanf(&quot;%d&quot;,&amp;alloc[i][j])!=1||alloc[i][j]&lt;0)return 1;
+    puts(&quot;Enter maximum-need matrix:&quot;);
+    for(int i=0;i&lt;n;i++)for(int j=0;j&lt;m;j++)if(scanf(&quot;%d&quot;,&amp;max[i][j])!=1||max[i][j]&lt;alloc[i][j])return puts(&quot;Max must be &gt;= allocation.&quot;),1;
+    puts(&quot;Enter available resources:&quot;);
+    for(int j=0;j&lt;m;j++)if(scanf(&quot;%d&quot;,&amp;avail[j])!=1||avail[j]&lt;0)return 1;
+    for(int i=0;i&lt;n;i++)for(int j=0;j&lt;m;j++)need[i][j]=max[i][j]-alloc[i][j];
+    while(count&lt;n){int progress=0;for(int i=0;i&lt;n;i++)if(!finish[i]){
+        int can=1;for(int j=0;j&lt;m;j++)if(need[i][j]&gt;avail[j])can=0;
+        if(can){for(int j=0;j&lt;m;j++)avail[j]+=alloc[i][j];seq[count++]=i;finish[i]=1;progress=1;}
+    }if(!progress)break;}
+    if(count==n){printf(&quot;Safe sequence: &quot;);for(int i=0;i&lt;n;i++)printf(&quot;P%d%s&quot;,seq[i],i==n-1?&quot;\n&quot;:&quot; -&gt; &quot;);}else puts(&quot;Unsafe state: no safe sequence exists.&quot;);
+    return 0;
+}</code></pre>
+  <div class="status" aria-live="polite"></div>
+</section>
+
+<section class="program" id="program-9" data-search="5b deadlock prevention — demonstrating the four conditions">
+  <div class="program-head">
+    <div><span class="tag">EX. 5B</span><h2>Deadlock Prevention — Demonstrating the four conditions</h2></div>
+    <button class="copy" type="button" data-copy="program-9" title="Copy code (Ctrl+Shift+C)">Copy code</button>
+  </div>
+  <div class="code-meta"><span>C</span><span>Compile: gcc program.c -o program && ./program</span></div>
+  <pre tabindex="0" aria-label="Code for Deadlock Prevention — Demonstrating the four conditions"><code id="program-9-code" class="language-c">#include &lt;stdio.h&gt;
+int main(void){
+    puts(&quot;Deadlock prevention strategies:&quot;);
+    puts(&quot;1. Mutual exclusion: make resources shareable where possible.&quot;);
+    puts(&quot;2. Hold and wait: request all required resources together, or release held resources before requesting more.&quot;);
+    puts(&quot;3. No preemption: allow resources to be taken back when a process cannot obtain its next resource.&quot;);
+    puts(&quot;4. Circular wait: impose a global order on resource types and request only in increasing order.&quot;);
+    puts(&quot;\nThis is a conceptual demonstration; actual prevention depends on the OS/resource manager.&quot;);
+    return 0;
+}</code></pre>
+  <div class="status" aria-live="polite"></div>
+</section>
+
+<section class="program" id="program-10" data-search="6a memory allocation — first fit">
+  <div class="program-head">
+    <div><span class="tag">EX. 6A</span><h2>Memory Allocation — First Fit</h2></div>
+    <button class="copy" type="button" data-copy="program-10" title="Copy code (Ctrl+Shift+C)">Copy code</button>
+  </div>
+  <div class="code-meta"><span>C</span><span>Compile: gcc program.c -o program && ./program</span></div>
+  <pre tabindex="0" aria-label="Code for Memory Allocation — First Fit"><code id="program-10-code" class="language-c">#include &lt;stdio.h&gt;
+int main(void){
+    int nb,np,b[100],p[100],a[100];
+    printf(&quot;Number of blocks (1-100): &quot;);if(scanf(&quot;%d&quot;,&amp;nb)!=1||nb&lt;1||nb&gt;100)return 1;
+    for(int i=0;i&lt;nb;i++){printf(&quot;Block %d size: &quot;,i+1);if(scanf(&quot;%d&quot;,&amp;b[i])!=1||b[i]&lt;0)return 1;}
+    printf(&quot;Number of processes (1-100): &quot;);if(scanf(&quot;%d&quot;,&amp;np)!=1||np&lt;1||np&gt;100)return 1;
+    for(int i=0;i&lt;np;i++){printf(&quot;Process %d size: &quot;,i+1);if(scanf(&quot;%d&quot;,&amp;p[i])!=1||p[i]&lt;0)return 1;a[i]=-1;}
+    for(int i=0;i&lt;np;i++)for(int j=0;j&lt;nb;j++)if(b[j]&gt;=p[i]){a[i]=j;b[j]-=p[i];break;}
+    puts(&quot;\nProcess  Size  Block (remaining capacity tracked)&quot;);
+    for(int i=0;i&lt;np;i++)if(a[i]&gt;=0)printf(&quot;P%d\t%d\t%d\n&quot;,i+1,p[i],a[i]+1);else printf(&quot;P%d\t%d\tNot allocated\n&quot;,i+1,p[i]);
+    return 0;
+}</code></pre>
+  <div class="status" aria-live="polite"></div>
+</section>
+
+<section class="program" id="program-11" data-search="6b memory allocation — worst fit">
+  <div class="program-head">
+    <div><span class="tag">EX. 6B</span><h2>Memory Allocation — Worst Fit</h2></div>
+    <button class="copy" type="button" data-copy="program-11" title="Copy code (Ctrl+Shift+C)">Copy code</button>
+  </div>
+  <div class="code-meta"><span>C</span><span>Compile: gcc program.c -o program && ./program</span></div>
+  <pre tabindex="0" aria-label="Code for Memory Allocation — Worst Fit"><code id="program-11-code" class="language-c">#include &lt;stdio.h&gt;
+int main(void){
+    int nb,np,b[100],p[100],a[100];
+    printf(&quot;Number of blocks (1-100): &quot;);if(scanf(&quot;%d&quot;,&amp;nb)!=1||nb&lt;1||nb&gt;100)return 1;
+    for(int i=0;i&lt;nb;i++){printf(&quot;Block %d size: &quot;,i+1);if(scanf(&quot;%d&quot;,&amp;b[i])!=1||b[i]&lt;0)return 1;}
+    printf(&quot;Number of processes (1-100): &quot;);if(scanf(&quot;%d&quot;,&amp;np)!=1||np&lt;1||np&gt;100)return 1;
+    for(int i=0;i&lt;np;i++){printf(&quot;Process %d size: &quot;,i+1);if(scanf(&quot;%d&quot;,&amp;p[i])!=1||p[i]&lt;0)return 1;a[i]=-1;}
+    for(int i=0;i&lt;np;i++){int best=-1;for(int j=0;j&lt;nb;j++)if(b[j]&gt;=p[i]&amp;&amp;(best&lt;0||b[j]&gt;b[best]))best=j;
+        if(best&gt;=0){a[i]=best;b[best]-=p[i];}}
+    puts(&quot;\nProcess  Size  Block&quot;);for(int i=0;i&lt;np;i++)if(a[i]&gt;=0)printf(&quot;P%d\t%d\t%d\n&quot;,i+1,p[i],a[i]+1);else printf(&quot;P%d\t%d\tNot allocated\n&quot;,i+1,p[i]);return 0;
+}</code></pre>
+  <div class="status" aria-live="polite"></div>
+</section>
+
+<section class="program" id="program-12" data-search="6c memory allocation — best fit">
+  <div class="program-head">
+    <div><span class="tag">EX. 6C</span><h2>Memory Allocation — Best Fit</h2></div>
+    <button class="copy" type="button" data-copy="program-12" title="Copy code (Ctrl+Shift+C)">Copy code</button>
+  </div>
+  <div class="code-meta"><span>C</span><span>Compile: gcc program.c -o program && ./program</span></div>
+  <pre tabindex="0" aria-label="Code for Memory Allocation — Best Fit"><code id="program-12-code" class="language-c">#include &lt;stdio.h&gt;
+int main(void){
+    int nb,np,b[100],p[100],a[100];
+    printf(&quot;Number of blocks (1-100): &quot;);if(scanf(&quot;%d&quot;,&amp;nb)!=1||nb&lt;1||nb&gt;100)return 1;
+    for(int i=0;i&lt;nb;i++){printf(&quot;Block %d size: &quot;,i+1);if(scanf(&quot;%d&quot;,&amp;b[i])!=1||b[i]&lt;0)return 1;}
+    printf(&quot;Number of processes (1-100): &quot;);if(scanf(&quot;%d&quot;,&amp;np)!=1||np&lt;1||np&gt;100)return 1;
+    for(int i=0;i&lt;np;i++){printf(&quot;Process %d size: &quot;,i+1);if(scanf(&quot;%d&quot;,&amp;p[i])!=1||p[i]&lt;0)return 1;a[i]=-1;}
+    for(int i=0;i&lt;np;i++){int best=-1;for(int j=0;j&lt;nb;j++)if(b[j]&gt;=p[i]&amp;&amp;(best&lt;0||b[j]&lt;b[best]))best=j;
+        if(best&gt;=0){a[i]=best;b[best]-=p[i];}}
+    puts(&quot;\nProcess  Size  Block&quot;);for(int i=0;i&lt;np;i++)if(a[i]&gt;=0)printf(&quot;P%d\t%d\t%d\n&quot;,i+1,p[i],a[i]+1);else printf(&quot;P%d\t%d\tNot allocated\n&quot;,i+1,p[i]);return 0;
+}</code></pre>
+  <div class="status" aria-live="polite"></div>
+</section>
+
+<section class="program" id="program-13" data-search="7a page replacement — fifo">
+  <div class="program-head">
+    <div><span class="tag">EX. 7A</span><h2>Page Replacement — FIFO</h2></div>
+    <button class="copy" type="button" data-copy="program-13" title="Copy code (Ctrl+Shift+C)">Copy code</button>
+  </div>
+  <div class="code-meta"><span>C</span><span>Compile: gcc program.c -o program && ./program</span></div>
+  <pre tabindex="0" aria-label="Code for Page Replacement — FIFO"><code id="program-13-code" class="language-c">#include &lt;stdio.h&gt;
+int main(void){
+    int n,f,p[1000],frame[100],faults=0,next=0;
+    printf(&quot;Number of page references (1-1000): &quot;);if(scanf(&quot;%d&quot;,&amp;n)!=1||n&lt;1||n&gt;1000)return 1;
+    printf(&quot;Reference string: &quot;);for(int i=0;i&lt;n;i++)if(scanf(&quot;%d&quot;,&amp;p[i])!=1)return 1;
+    printf(&quot;Number of frames (1-100): &quot;);if(scanf(&quot;%d&quot;,&amp;f)!=1||f&lt;1||f&gt;100)return 1;
+    for(int j=0;j&lt;f;j++)frame[j]=-1;
+    for(int i=0;i&lt;n;i++){int hit=0;for(int j=0;j&lt;f;j++)if(frame[j]==p[i])hit=1;
+        if(!hit){frame[next]=p[i];next=(next+1)%f;faults++;}
+        printf(&quot;%d: &quot;,p[i]);for(int j=0;j&lt;f;j++)if(frame[j]&lt;0)printf(&quot;- &quot;);else printf(&quot;%d &quot;,frame[j]);puts(hit?&quot;(hit)&quot;:&quot;(fault)&quot;);}
+    printf(&quot;Total page faults: %d\n&quot;,faults);return 0;
+}</code></pre>
+  <div class="status" aria-live="polite"></div>
+</section>
+
+<section class="program" id="program-14" data-search="7b page replacement — lru">
+  <div class="program-head">
+    <div><span class="tag">EX. 7B</span><h2>Page Replacement — LRU</h2></div>
+    <button class="copy" type="button" data-copy="program-14" title="Copy code (Ctrl+Shift+C)">Copy code</button>
+  </div>
+  <div class="code-meta"><span>C</span><span>Compile: gcc program.c -o program && ./program</span></div>
+  <pre tabindex="0" aria-label="Code for Page Replacement — LRU"><code id="program-14-code" class="language-c">#include &lt;stdio.h&gt;
+int main(void){
+    int n,f,p[1000],frame[100],last[100],faults=0,tick=0;
+    printf(&quot;Number of page references (1-1000): &quot;);if(scanf(&quot;%d&quot;,&amp;n)!=1||n&lt;1||n&gt;1000)return 1;
+    printf(&quot;Reference string: &quot;);for(int i=0;i&lt;n;i++)if(scanf(&quot;%d&quot;,&amp;p[i])!=1)return 1;
+    printf(&quot;Number of frames (1-100): &quot;);if(scanf(&quot;%d&quot;,&amp;f)!=1||f&lt;1||f&gt;100)return 1;
+    for(int j=0;j&lt;f;j++){frame[j]=-1;last[j]=0;}
+    for(int i=0;i&lt;n;i++){tick++;int pos=-1;for(int j=0;j&lt;f;j++)if(frame[j]==p[i])pos=j;
+        if(pos&gt;=0)last[pos]=tick;else{faults++;pos=-1;for(int j=0;j&lt;f;j++)if(frame[j]==-1){pos=j;break;}
+            if(pos&lt;0){pos=0;for(int j=1;j&lt;f;j++)if(last[j]&lt;last[pos])pos=j;}frame[pos]=p[i];last[pos]=tick;}
+        printf(&quot;%d: &quot;,p[i]);for(int j=0;j&lt;f;j++)if(frame[j]&lt;0)printf(&quot;- &quot;);else printf(&quot;%d &quot;,frame[j]);puts(pos&gt;=0?&quot;&quot;:&quot;&quot;);}
+    printf(&quot;Total page faults: %d\n&quot;,faults);return 0;
+}</code></pre>
+  <div class="status" aria-live="polite"></div>
+</section>
+
+<section class="program" id="program-15" data-search="7c page replacement — lfu (ties: least recently used)">
+  <div class="program-head">
+    <div><span class="tag">EX. 7C</span><h2>Page Replacement — LFU (ties: least recently used)</h2></div>
+    <button class="copy" type="button" data-copy="program-15" title="Copy code (Ctrl+Shift+C)">Copy code</button>
+  </div>
+  <div class="code-meta"><span>C</span><span>Compile: gcc program.c -o program && ./program</span></div>
+  <pre tabindex="0" aria-label="Code for Page Replacement — LFU (ties: least recently used)"><code id="program-15-code" class="language-c">#include &lt;stdio.h&gt;
+int main(void){
+    int n,f,p[1000],frame[100],freq[100],last[100],faults=0,tick=0;
+    printf(&quot;Number of page references (1-1000): &quot;);if(scanf(&quot;%d&quot;,&amp;n)!=1||n&lt;1||n&gt;1000)return 1;
+    printf(&quot;Reference string: &quot;);for(int i=0;i&lt;n;i++)if(scanf(&quot;%d&quot;,&amp;p[i])!=1)return 1;
+    printf(&quot;Number of frames (1-100): &quot;);if(scanf(&quot;%d&quot;,&amp;f)!=1||f&lt;1||f&gt;100)return 1;
+    for(int j=0;j&lt;f;j++){frame[j]=-1;freq[j]=0;last[j]=0;}
+    for(int i=0;i&lt;n;i++){tick++;int pos=-1;for(int j=0;j&lt;f;j++)if(frame[j]==p[i])pos=j;
+        if(pos&gt;=0){freq[pos]++;last[pos]=tick;}else{faults++;pos=-1;for(int j=0;j&lt;f;j++)if(frame[j]==-1){pos=j;break;}
+            if(pos&lt;0){pos=0;for(int j=1;j&lt;f;j++)if(freq[j]&lt;freq[pos]||(freq[j]==freq[pos]&amp;&amp;last[j]&lt;last[pos]))pos=j;}
+            frame[pos]=p[i];freq[pos]=1;last[pos]=tick;}
+        printf(&quot;%d: &quot;,p[i]);for(int j=0;j&lt;f;j++)if(frame[j]&lt;0)printf(&quot;- &quot;);else printf(&quot;%d &quot;,frame[j]);puts(&quot;&quot;);}
+    printf(&quot;Total page faults: %d\n&quot;,faults);return 0;
+}</code></pre>
+  <div class="status" aria-live="polite"></div>
+</section>
+
+<section class="program" id="program-16" data-search="8a security model — bell–lapadula (confidentiality)">
+  <div class="program-head">
+    <div><span class="tag">EX. 8A</span><h2>Security Model — Bell–LaPadula (confidentiality)</h2></div>
+    <button class="copy" type="button" data-copy="program-16" title="Copy code (Ctrl+Shift+C)">Copy code</button>
+  </div>
+  <div class="code-meta"><span>C</span><span>Compile: gcc program.c -o program && ./program</span></div>
+  <pre tabindex="0" aria-label="Code for Security Model — Bell–LaPadula (confidentiality)"><code id="program-16-code" class="language-c">#include &lt;stdio.h&gt;
+typedef enum { PUBLIC=0, CONFIDENTIAL=1, SECRET=2, TOP_SECRET=3 } Level;
+const char *name(Level l){const char *n[]={&quot;Public&quot;,&quot;Confidential&quot;,&quot;Secret&quot;,&quot;Top Secret&quot;};return n[l];}
+int main(void){
+    int s,o,read,write;
+    printf(&quot;Subject clearance (0 Public, 1 Confidential, 2 Secret, 3 Top Secret): &quot;);if(scanf(&quot;%d&quot;,&amp;s)!=1||s&lt;0||s&gt;3)return 1;
+    printf(&quot;Object classification (0-3): &quot;);if(scanf(&quot;%d&quot;,&amp;o)!=1||o&lt;0||o&gt;3)return 1;
+    printf(&quot;Operation (1=read, 2=write): &quot;);if(scanf(&quot;%d&quot;,&amp;read)!=1||(read!=1&amp;&amp;read!=2))return 1;
+    write=(read==2);
+    printf(&quot;Subject=%s, Object=%s\n&quot;,name((Level)s),name((Level)o));
+    if(!write)puts(s&gt;=o?&quot;READ ALLOWED (no read up)&quot;:&quot;READ DENIED (no read up)&quot;);
+    else puts(s&lt;=o?&quot;WRITE ALLOWED (no write down)&quot;:&quot;WRITE DENIED (no write down)&quot;);
+    return 0;
+}</code></pre>
+  <div class="status" aria-live="polite"></div>
+</section>
+
+<section class="program" id="program-17" data-search="8b security model — biba (integrity)">
+  <div class="program-head">
+    <div><span class="tag">EX. 8B</span><h2>Security Model — Biba (integrity)</h2></div>
+    <button class="copy" type="button" data-copy="program-17" title="Copy code (Ctrl+Shift+C)">Copy code</button>
+  </div>
+  <div class="code-meta"><span>C</span><span>Compile: gcc program.c -o program && ./program</span></div>
+  <pre tabindex="0" aria-label="Code for Security Model — Biba (integrity)"><code id="program-17-code" class="language-c">#include &lt;stdio.h&gt;
+typedef enum { LOW=0, MEDIUM=1, HIGH=2, VERY_HIGH=3 } Integrity;
+const char *name(int x){const char *n[]={&quot;Low&quot;,&quot;Medium&quot;,&quot;High&quot;,&quot;Very High&quot;};return n[x];}
+int main(void){
+    int s,o,op;
+    printf(&quot;Subject integrity (0 Low, 1 Medium, 2 High, 3 Very High): &quot;);if(scanf(&quot;%d&quot;,&amp;s)!=1||s&lt;0||s&gt;3)return 1;
+    printf(&quot;Object integrity (0-3): &quot;);if(scanf(&quot;%d&quot;,&amp;o)!=1||o&lt;0||o&gt;3)return 1;
+    printf(&quot;Operation (1=read, 2=write): &quot;);if(scanf(&quot;%d&quot;,&amp;op)!=1||(op!=1&amp;&amp;op!=2))return 1;
+    printf(&quot;Subject=%s, Object=%s\n&quot;,name(s),name(o));
+    if(op==1)puts(s&lt;=o?&quot;READ ALLOWED (no read down)&quot;:&quot;READ DENIED (no read down)&quot;);
+    else puts(s&gt;=o?&quot;WRITE ALLOWED (no write up)&quot;:&quot;WRITE DENIED (no write up)&quot;);
+    return 0;
+}</code></pre>
+  <div class="status" aria-live="polite"></div>
+</section>
+
+<section class="program" id="program-18" data-search="9 linux access control lists — setfacl / getfacl">
+  <div class="program-head">
+    <div><span class="tag">EX. 9</span><h2>Linux Access Control Lists — setfacl / getfacl</h2></div>
+    <button class="copy" type="button" data-copy="program-18" title="Copy code (Ctrl+Shift+C)">Copy code</button>
+  </div>
+  <div class="code-meta"><span>BASH</span><span>Run: bash script.sh</span></div>
+  <pre tabindex="0" aria-label="Code for Linux Access Control Lists — setfacl / getfacl"><code id="program-18-code" class="language-bash"># Create a test file and directory
+mkdir -p acl_demo
+printf &#x27;ACL test file\n&#x27; &gt; acl_demo/sample.txt
+
+# View the current ACL
+getfacl acl_demo/sample.txt
+
+# Grant user alice read/write access (replace alice with an existing username)
+sudo setfacl -m u:alice:rw- acl_demo/sample.txt
+
+# Grant group developers read/execute access on the directory
+sudo setfacl -m g:developers:r-x acl_demo
+
+# Verify ACL entries
+getfacl acl_demo/sample.txt
+getfacl acl_demo
+
+# Remove the named user&#x27;s ACL entry
+sudo setfacl -x u:alice acl_demo/sample.txt
+
+# Remove all extended ACL entries from the file
+setfacl -b acl_demo/sample.txt
+
+# Cleanup (optional)
+# rm -r acl_demo</code></pre>
+  <div class="status" aria-live="polite"></div>
+</section>
+
+<section class="program" id="program-19" data-search="10 linux security — enable / disable aslr">
+  <div class="program-head">
+    <div><span class="tag">EX. 10</span><h2>Linux Security — Enable / Disable ASLR</h2></div>
+    <button class="copy" type="button" data-copy="program-19" title="Copy code (Ctrl+Shift+C)">Copy code</button>
+  </div>
+  <div class="code-meta"><span>BASH</span><span>Run: bash script.sh</span></div>
+  <pre tabindex="0" aria-label="Code for Linux Security — Enable / Disable ASLR"><code id="program-19-code" class="language-bash"># Check current ASLR setting (0=off, 1=conservative, 2=full)
+cat /proc/sys/kernel/randomize_va_space
+
+# Temporarily enable full ASLR until reboot
+sudo sysctl -w kernel.randomize_va_space=2
+
+# Temporarily disable ASLR (testing only; reduces security)
+sudo sysctl -w kernel.randomize_va_space=0
+
+# Restore the recommended full ASLR setting
+sudo sysctl -w kernel.randomize_va_space=2
+
+# Persist full ASLR across reboot using a dedicated sysctl config
+echo &#x27;kernel.randomize_va_space=2&#x27; | sudo tee /etc/sysctl.d/99-aslr.conf
+sudo sysctl --system
+
+# Verify
+sysctl kernel.randomize_va_space</code></pre>
+  <div class="status" aria-live="polite"></div>
+</section>
+    <p id="empty" class="empty">No programs match your search.</p>
+  </main>
+</div>
+<div class="footer">Single-file HTML · Works offline · Copy buttons do not require internet</div>
+<script>
+const search = document.getElementById('search');
+const sections = [...document.querySelectorAll('.program')];
+const links = [...document.querySelectorAll('nav a')];
+function filterPrograms(){
+  const q=search.value.trim().toLowerCase(); let shown=0;
+  sections.forEach((s,i)=>{const ok=!q||s.dataset.search.includes(q)||s.textContent.toLowerCase().includes(q);s.style.display=ok?'':'none';links[i].style.display=ok?'':'none';if(ok)shown++;});
+  document.getElementById('empty').style.display=shown?'none':'block';
+}
+search.addEventListener('input',filterPrograms);
+async function copyProgram(section){
+  if(!section)return;
+  const code=section.querySelector('code'); const status=section.querySelector('.status');
+  try{await navigator.clipboard.writeText(code.innerText);status.textContent='Code copied to clipboard.';}
+  catch(e){const area=document.createElement('textarea');area.value=code.innerText;document.body.appendChild(area);area.select();const ok=document.execCommand('copy');area.remove();status.textContent=ok?'Code copied to clipboard.':'Clipboard blocked — select the code and copy manually.';}
+  const btn=section.querySelector('.copy');btn.classList.add('done');btn.textContent='Copied!';setTimeout(()=>{btn.classList.remove('done');btn.textContent='Copy code';},1400);
+}
+document.querySelectorAll('.copy').forEach(b=>b.addEventListener('click',()=>copyProgram(document.getElementById(b.dataset.copy))));
+document.getElementById('copyFocused').addEventListener('click',()=>{
+  const active=document.activeElement;
+  let section=active.closest?.('.program');
+  if(!section)section=sections.find(s=>s.style.display!=='none');
+  copyProgram(section);
+});
+document.addEventListener('keydown',e=>{
+  if(e.ctrlKey&&e.shiftKey&&e.key.toLowerCase()==='c'){
+    e.preventDefault();let section=document.activeElement.closest?.('.program');
+    if(!section)section=sections.find(s=>s.style.display!=='none');
+    copyProgram(section);
+  }
+});
+document.getElementById('expandAll').addEventListener('click',()=>{
+  const allVisible=sections.every(s=>s.style.display==='none'||s.dataset.expanded==='true');
+  sections.forEach(s=>{if(s.style.display!=='none'){s.dataset.expanded=allVisible?'false':'true';s.querySelector('pre').style.display=allVisible?'none':'block';}});
+  document.getElementById('expandAll').textContent=allVisible?'Show all programs':'Hide code blocks';
+});
+</script>
+</body>
+</html>
